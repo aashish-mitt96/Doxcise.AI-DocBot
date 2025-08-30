@@ -89,6 +89,7 @@ export default function SignUpPage() {
                 path="/sign-up"
                 routing="path"
                 signInUrl="/sign-in"
+                afterSignInUrl="/dashboard"
               />
             </div>
 

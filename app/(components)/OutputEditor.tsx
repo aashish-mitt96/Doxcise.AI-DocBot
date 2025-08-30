@@ -1,16 +1,14 @@
 "use client"
 
-import React, { useRef, useEffect } from "react"
-import { Editor } from "@toast-ui/react-editor"
-import "@toast-ui/editor/dist/toastui-editor.css"
+import React, { useEffect } from "react"
+import { EditorContent, useEditor } from "@tiptap/react"
+import StarterKit from "@tiptap/starter-kit"
 
 interface OutputEditorProps {
   content: string;
 }
 
 const OutputEditor = ({ content }: OutputEditorProps) => {
-  const editorRef = useRef<any>(null);
-
   // Converts text into markdown bullet points
   const formatAsMarkdownBullets = (text: string): string => {
     const lines = text
@@ -21,22 +19,23 @@ const OutputEditor = ({ content }: OutputEditorProps) => {
     return lines.map(line => `- ${line}`).join("\n");
   };
 
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: "",
+    editable: false,
+    immediatelyRender: false, // 👈 FIX for SSR hydration issue
+  });
+
   useEffect(() => {
-    if (editorRef.current && content) {
+    if (editor && content) {
       const markdown = formatAsMarkdownBullets(content);
-      editorRef.current.getInstance().setMarkdown(markdown);
+      editor.commands.setContent(markdown.replace(/^- /gm, "• "));
     }
-  }, [content]);
+  }, [content, editor]);
 
   return (
-    <div className="editor-wrapper">
-      <Editor
-        ref={editorRef}
-        previewStyle="vertical"
-        height="400px"
-        initialEditType="markdown"
-        useCommandShortcut={true}
-      />
+    <div className="editor-wrapper border rounded-lg p-2 bg-white shadow">
+      <EditorContent editor={editor} />
     </div>
   );
 };
